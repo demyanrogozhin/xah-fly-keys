@@ -3679,7 +3679,6 @@ Version 2019-02-12"
   ;; set control meta, etc keys
 
   (progn
-    (define-key xah-fly-key-map (kbd "<home>") 'xah-fly-command-mode-activate)
     (define-key xah-fly-key-map (kbd "<menu>") 'xah-fly-command-mode-activate)
     (define-key xah-fly-key-map (kbd "<f8>") 'xah-fly-command-mode-activate-no-hook)
 
@@ -3705,6 +3704,9 @@ Version 2019-02-12"
   ;;
   (when xah-fly-use-control-key
     (progn
+
+      (define-key xah-fly-key-map (kbd "<C-return>") 'xah-fly-mode-toggle)
+      (define-key xah-fly-key-map (kbd "C-f") 'xah-fly-mode-toggle)
 
       (define-key xah-fly-key-map (kbd "<C-S-prior>") 'xah-previous-emacs-buffer)
       (define-key xah-fly-key-map (kbd "<C-S-next>") 'xah-next-emacs-buffer)
@@ -3762,6 +3764,10 @@ Version 2019-02-12"
 
   (progn
     (when xah-fly-use-meta-key
+      (define-key xah-fly-key-map (kbd "M-h") 'backward-char)
+      (define-key xah-fly-key-map (kbd "M-j") 'next-line)
+      (define-key xah-fly-key-map (kbd "M-k") 'previous-line)
+      (define-key xah-fly-key-map (kbd "M-l") 'forward-char)
       (define-key xah-fly-key-map (kbd "M-SPC") 'xah-fly-command-mode-activate-no-hook))))
 
 
@@ -3790,78 +3796,81 @@ Version 2019-02-12"
   (setq xah-fly-key--current-layout @layout)
   (load "xah-fly-keys"))
 
-(defun xah-fly-command-mode-init ()
+(defun dmn-fly-command-mode-init ()
   "Set command mode keys.
-Version 2017-01-21"
+Version 2020-01-31"
   (interactive)
   (xah-fly--define-keys
    xah-fly-key-map
    '(
      ("~" . nil)
-     (":" . nil)
+     (":" . isearch-backward)
 
      ("SPC" . xah-fly-leader-key-map)
      ("DEL" . xah-fly-leader-key-map)
+     ("<" . beginning-of-buffer)
+     (">" . end-of-buffer)
 
-     ("'" . xah-reformat-lines)
-     ("," . xah-shrink-whitespaces)
-     ("-" . xah-cycle-hyphen-underscore-space)
-     ("." . xah-backward-kill-word)
-     (";" . xah-comment-dwim)
-     ("/" . hippie-expand)
-     ("\\" . nil)
+     ("\\" . isearch-backward)
      ;; ("=" . xah-forward-equal-sign)
-     ("[" . xah-backward-punct )
-     ("]" . xah-forward-punct)
-     ("`" . other-frame)
-
      ;; ("#" . xah-backward-quote)
      ;; ("$" . xah-forward-punct)
 
+     ;; top row: left side
+     ("`" . other-frame)
      ("1" . xah-extend-selection)
      ("2" . xah-select-line)
      ("3" . delete-other-windows)
      ("4" . split-window-below)
      ("5" . delete-char)
+     ;; top row: right side
      ("6" . xah-select-block)
      ("7" . xah-select-line)
      ("8" . xah-extend-selection)
      ("9" . xah-select-text-in-quote)
      ("0" . xah-pop-local-mark-ring)
+     ("[" . hippie-expand)                          ; -
+     ("]" . xah-backward-equal-sign)                ; =
 
-     ("a" . execute-extended-command)
-     ("b" . isearch-forward)
-     ("c" . previous-line)
-     ("d" . xah-beginning-of-line-or-block)
-     ("e" . xah-delete-backward-char-or-bracket-text)
-     ("f" . undo)
-     ("g" . backward-word)
-     ("h" . backward-char)
-     ("i" . xah-delete-current-text-block)
-     ("j" . xah-copy-line-or-region)
-     ("k" . xah-paste-or-paste-previous)
-     ;; ("l" . xah-fly-insert-mode-activate-space-before)
-     ("l" . xah-insert-space-before)
-     ("m" . xah-backward-left-bracket)
-     ("n" . forward-char)
-     ("o" . open-line)
-     ("p" . xah-kill-word)
-     ("q" . xah-cut-line-or-region)
-     ("r" . forward-word)
-     ("s" . xah-end-of-line-or-block)
-     ("t" . next-line)
-     ("u" . xah-fly-insert-mode-activate)
-     ("v" . xah-forward-right-bracket)
-     ("w" . xah-next-window-or-frame)
-     ("x" . xah-toggle-letter-case)
-     ("y" . set-mark-command)
-     ("z" . xah-goto-matching-bracket)))
-
-  (define-key xah-fly-key-map (kbd (xah-fly--key-char "a"))
-    (cond ((fboundp 'smex) 'smex)
-	  ((fboundp 'helm-M-x) 'helm-M-x)
-	  ((fboundp 'counsel-M-x) 'counsel-M-x)
-	  (t 'execute-extended-command)))
+     ;; first row: left side
+     ("'" . quit-window)                            ; q
+     ("," . xah-shrink-whitespaces)                 ; w
+     ("." . xah-backward-kill-word)                 ; e
+     ("p" . xah-kill-word)                          ; r
+     ("y" . set-mark-command)                       ; t
+     ;; first row: right side
+     ("f" . xah-beginning-of-line-or-block)         ; y
+     ("g" . backward-word)                          ; u
+     ("c" . xah-fly-insert-mode-activate)           ; i
+     ("r" . forward-word)                           ; o
+     ("l" . xah-end-of-line-or-block)               ; p
+     ("/" . xah-backward-punct)                     ; [
+     ("=" . xah-forward-punct)                      ; ]
+     ;; second row: left side
+     ("a" . execute-extended-command)               ; a
+     ("o" . delete-backward-char)                   ; s
+     ("e" . delete-char)                            ; d
+     ("u" . xah-fly-insert-mode-activate)           ; f
+     ("i" . xah-search-current-word)                ; g
+     ;; second row: right side - movement keys
+     ("d" . backward-char)                          ; h
+     ("h" . next-line)                              ; j
+     ("t" . previous-line)                          ; k
+     ("n" . forward-char)                           ; l
+     ("s" . isearch-forward)                        ; ;
+     ("-" . xah-comment-dwim)                       ; '
+     ;; third row: left side
+     (";" . undo)                                   ; z
+     ("q" . xah-cut-line-or-region)                 ; x
+     ("j" . xah-copy-line-or-region)                ; c
+     ("k" . xah-paste-or-paste-previous)            ; v
+     ("x" . xah-toggle-letter-case)                 ; b
+     ;; third row: left side
+     ("b" . xah-next-user-buffer)                   ; n
+     ("m" . xah-next-window-or-frame)               ; m
+     ("w" . xah-backward-left-bracket)              ; ,
+     ("v" . xah-forward-right-bracket)              ; .
+     ("z" . xah-goto-matching-bracket)))            ; /
 
   ;; (when xah-fly-swapped-1-8-and-2-7-p
   ;;     (xah-fly--define-keys
@@ -3901,9 +3910,12 @@ Version 2018-05-07"
    xah-fly-key-map
    '(
 
+     ("RET" . nil)
      ("SPC" . nil)
-     ;; ("SPC" . xah-fly-space-key)
      ("DEL" . nil)
+     ("<" . nil)
+     (">" . nil)
+     (":" . nil)
 
      ("'" . nil)
      ("," . nil)
@@ -3989,14 +4001,14 @@ Version 2018-05-07"
   "Activate command mode and run `xah-fly-command-mode-activate-hook'
 Version 2017-07-07"
   (interactive)
-  (xah-fly-command-mode-init)
+  (dmn-fly-command-mode-init)
   (run-hooks 'xah-fly-command-mode-activate-hook))
 
 (defun xah-fly-command-mode-activate-no-hook ()
   "Activate command mode. Does not run `xah-fly-command-mode-activate-hook'
 Version 2017-07-07"
   (interactive)
-  (xah-fly-command-mode-init))
+  (dmn-fly-command-mode-init))
 
 (defun xah-fly-insert-mode-activate ()
   "Activate insertion mode.
