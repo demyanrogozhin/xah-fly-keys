@@ -3882,7 +3882,8 @@ Version 2020-01-31"
   ;;        ("1" . xah-extend-selection))))
 
   (progn
-    (setq xah-fly-insert-state-q nil )
+    (setq xah-fly-insert-state-q nil)
+    (blink-cursor-mode 0)
     (modify-all-frames-parameters (list (cons 'cursor-type 'box))))
 
   (setq mode-line-front-space "C")
@@ -3975,8 +3976,9 @@ Version 2018-05-07"
      ))
 
   (progn
-    (setq xah-fly-insert-state-q t )
-    (modify-all-frames-parameters (list (cons 'cursor-type 'bar))))
+    (setq xah-fly-insert-state-q t)
+    (blink-cursor-mode 1)
+    (modify-all-frames-parameters (list (cons 'cursor-type 'hbar))))
 
   (setq mode-line-front-space "I")
   (force-mode-line-update)
